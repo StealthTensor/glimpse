@@ -1,0 +1,74 @@
+# Glimpse Authentication & Security Policy
+version: "1.0"
+
+default_policy:
+  methods: [face, password]
+  liveness_required: true
+  min_similarity: 0.450
+  max_timeout_sec: 2.5
+  allow_password_fallback: true
+
+services:
+  # Privilege elevation
+  sudo:
+    methods: [face, password]
+    liveness_required: true
+    min_similarity: 0.450
+    max_timeout_sec: 2.5
+    allow_password_fallback: true
+
+  # KDE Screen Unlock
+  kde:
+    methods: [face, password]
+    liveness_required: true
+    min_similarity: 0.450
+    max_timeout_sec: 3.0
+    allow_password_fallback: true
+
+  kscreenlocker:
+    methods: [face, password]
+    liveness_required: true
+    min_similarity: 0.450
+    max_timeout_sec: 3.0
+    allow_password_fallback: true
+
+  # SDDM Cold Boot Login
+  sddm:
+    methods: [face, password]
+    liveness_required: true
+    min_similarity: 0.480
+    max_timeout_sec: 3.5
+    allow_password_fallback: true
+
+  # High-risk: su interactive shell hopping (password strictly enforced)
+  su:
+    methods: [password]
+    liveness_required: false
+    min_similarity: 1.0
+    max_timeout_sec: 0.0
+    allow_password_fallback: true
+
+  # Custom Application Protection
+  app_protection:
+    methods: [face, password]
+    liveness_required: true
+    min_similarity: 0.450
+    max_timeout_sec: 3.0
+    allow_password_fallback: true
+
+  # Custom Folder Protection
+  folder_protection:
+    methods: [face, password]
+    liveness_required: true
+    min_similarity: 0.450
+    max_timeout_sec: 3.0
+    allow_password_fallback: true
+
+  # PolicyKit / Polkit (GUI privilege elevation, Dolphin admin, etc.)
+  polkit-1:
+    methods: [face, password]
+    liveness_required: true
+    min_similarity: 0.450
+    max_timeout_sec: 3.0
+    allow_password_fallback: true
+

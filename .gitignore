@@ -1,0 +1,36 @@
+# Python bytecode & virtual environments
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+env/
+build/
+dist/
+*.egg-info/
+
+# Compiled Binaries
+pam/*.so
+*.so
+tests/test_pam
+
+# Sensitive Biometric Vault & User Config
+*.enc
+.local/
+vault/*.enc
+
+# Temporary / Backup Files
+*.log
+/tmp/
+*.sentinel_bak
+*.glimpse_bak
+
+# IDE & Editor Junk
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Old legacy models (we ship YuNet 2023mar and ArcFace w600k_mbf)
+models/face_recognition_sface_2021dec.onnx
+models/arcface.onnx

@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# Glimpse Apple Glance UI Launcher
+set -e
+SCRIPT_PATH="$(realpath "${BASH_SOURCE[0]}")"
+GLIMPSE_ROOT="$(cd "$(dirname "${SCRIPT_PATH}")/.." && pwd)"
+export PYTHONPATH="${GLIMPSE_ROOT}/src:${PYTHONPATH}"
+export QT_QPA_PLATFORM="xcb"
+export PYTHONUNBUFFERED=1
+exec "${GLIMPSE_ROOT}/.venv/bin/python" "${GLIMPSE_ROOT}/src/glimpse/ui/overlay.py" "$@"

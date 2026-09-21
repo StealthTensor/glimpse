@@ -1,0 +1,13 @@
+[Unit]
+Description=Glimpse Facial Authentication Daemon
+After=default.target
+
+[Service]
+Type=simple
+ExecStart=/home/stealthtensor/EX/pro/Glimpse/bin/glimpsed
+Restart=always
+RestartSec=2
+KillMode=process
+
+[Install]
+WantedBy=default.target

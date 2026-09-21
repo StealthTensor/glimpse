@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Glimpse FaceID UI
+Comment=Apple Glance Big Square FaceID UI Overlay for Linux
+Exec=/home/stealthtensor/EX/pro/Glimpse/bin/glimpse-ui
+Terminal=false
+Hidden=false
+NoDisplay=false
+X-GNOME-Autostart-enabled=true
+X-KDE-autostart-after=panel

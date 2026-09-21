@@ -1,0 +1,16 @@
+[Desktop Entry]
+Type=Service
+X-KDE-ServiceTypes=KonqPopupMenu/Plugin
+MimeType=inode/directory;
+Actions=glimpseLock;glimpseUnlock;
+X-KDE-Priority=TopLevel
+
+[Desktop Action glimpseLock]
+Name=Lock with Glimpse FaceID
+Icon=security-high
+Exec=/usr/local/bin/glimpse lock "%f"
+
+[Desktop Action glimpseUnlock]
+Name=Unlock with Glimpse FaceID
+Icon=security-low
+Exec=/usr/local/bin/glimpse unlock "%f"

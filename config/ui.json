@@ -1,0 +1,26 @@
+{
+  "style": "apple_top_notch",
+  "dimensions": {
+    "body_width": 160,
+    "expanded_height": 160,
+    "top_radius": 18,
+    "bottom_radius": 40,
+    "glyph_size": 110,
+    "glyph_y_offset": -1
+  },
+  "timings": {
+    "drop_duration_ms": 440,
+    "retract_duration_ms": 340,
+    "drop_curve": "OutCubic",
+    "retract_curve": "OutCubic",
+    "success_hold_ms": 1100,
+    "failure_hold_ms": 1400
+  },
+  "illumination": {
+    "mode": "retina_flash",
+    "brightness": 10000,
+    "fill_opacity": 0.88,
+    "glow_depth": 380,
+    "luminance_threshold": 45.0
+  }
+}

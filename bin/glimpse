@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# Glimpse CLI Launcher
+set -e
+SCRIPT_PATH="$(realpath "${BASH_SOURCE[0]}")"
+GLIMPSE_ROOT="$(cd "$(dirname "${SCRIPT_PATH}")/.." && pwd)"
+export PYTHONPATH="${GLIMPSE_ROOT}/src:${PYTHONPATH}"
+export PYTHONUNBUFFERED=1
+exec "${GLIMPSE_ROOT}/.venv/bin/python" "${GLIMPSE_ROOT}/src/glimpse/cli/main.py" "$@"
