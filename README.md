@@ -1,4 +1,4 @@
-# Glimpse 👁️
+# Glimpse 
 
 A local-first facial authentication system for Linux that doesn't feel like a science fair project.
 
@@ -8,17 +8,8 @@ No cloud telemetry. No IR hardware required. No 10-second delays while a heavy n
 
 ---
 
-## Why build this?
+## Demo
 
-If you've ever tried setting up face unlock on Linux, you know the drill:
-
-1. **The Ghost Town Problem**: Most existing tools are either abandoned Python 2/3.8 projects that break on modern distros (Ubuntu 24.04+/Debian 13), or require expensive infrared hardware that 95% of laptops don't have.
-2. **The "It Froze My Screen" Experience**: The few projects that do work with regular RGB webcams are often text-only CLI scripts with zero visual feedback, or they lock up your entire Wayland compositor while OpenCV chugs along on a single thread.
-3. **The Muscle Memory Toll**: Typing a 20-character password 50 times a day just to test code or run `sudo apt update` gets old fast.
-
-Glimpse was built to solve this properly on modern Linux (tested on Kubuntu 25.10 with KDE Plasma 6.4 on Wayland). It uses high-dimensional 512-D ArcFace embeddings, runs in sub-12ms on a regular CPU with AVX2, and hooks cleanly into the system authentication stack without breaking your password fallback.
-
----
 
 ## Architecture & Pipeline
 
