@@ -18,6 +18,7 @@ from glimpse.engine.embedder import FaceEmbedder
 from glimpse.engine.matcher import BiometricMatcher
 from glimpse.engine.liveness import RGBLivenessDetector, LivenessResult
 from glimpse.storage.vault import BiometricVault
+from glimpse.daemon.backlight import BacklightManager
 
 logger = logging.getLogger("glimpse.daemon.session")
 
@@ -52,6 +53,7 @@ class AuthSession:
         self.vault = vault
         self.device_index = device_index
         self.state = SessionState.IDLE
+        self.backlight = BacklightManager()
 
     def authenticate(
         self,
@@ -97,6 +99,8 @@ class AuthSession:
         verified = False
         fail_reason = "timeout"
         night_mode_triggered = False
+        backlight_boosted = False
+        luminance_threshold = 45.0
 
         effective_threshold = min_similarity if min_similarity is not None else self.matcher.threshold
 
@@ -109,11 +113,13 @@ class AuthSession:
                 if not ret or frame is None:
                     continue
 
-                # Pitch Black Room Detection: check mean frame luminance
+                # Pitch Black / Low Light Detection: check mean frame luminance
                 mean_lum = float(np.mean(frame))
-                if mean_lum < 38.0 and not night_mode_triggered:
+                if mean_lum < luminance_threshold and not night_mode_triggered:
                     night_mode_triggered = True
-                    logger.info(f"Low ambient luminance detected ({mean_lum:.1f} < 38.0). Triggering screen fill light.")
+                    logger.info(f"Low ambient luminance detected ({mean_lum:.1f} < {luminance_threshold}). Boosting screen backlight.")
+                    self.backlight.boost()
+                    backlight_boosted = True
                     if event_callback:
                         event_callback("night_mode_on", {"luminance": mean_lum})
 
@@ -160,8 +166,10 @@ class AuthSession:
                 else:
                     consecutive_matches = 0
         finally:
-            # Guarantee immediate camera release
+            # Guarantee immediate camera release and backlight restoration
             cam.release()
+            if backlight_boosted:
+                self.backlight.restore()
             if event_callback and night_mode_triggered:
                 event_callback("night_mode_off", {})
 

@@ -17,37 +17,41 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtCore import Qt, QRectF
 from PyQt6.QtGui import QPainter, QColor, QLinearGradient, QBrush
 
+from glimpse.daemon.backlight import BacklightManager
+
 logger = logging.getLogger("glimpse.ui.illuminator")
 
 
 class BrightnessManager:
-    """Controls KDE Plasma display brightness via D-Bus."""
+    """Controls display hardware brightness with sysfs direct access and D-Bus fallback."""
 
     @staticmethod
     def get_brightness() -> Optional[int]:
-        try:
-            res = subprocess.check_output([
-                "qdbus6", "org.kde.Solid.PowerManagement",
-                "/org/kde/Solid/PowerManagement/Actions/BrightnessControl",
-                "org.kde.Solid.PowerManagement.Actions.BrightnessControl.brightness"
-            ], text=True, timeout=0.8).strip()
-            return int(res)
-        except Exception:
-            return None
+        devs = BacklightManager._find_backlight_devices()
+        for dev in devs:
+            try:
+                cur = int((dev / "brightness").read_text().strip())
+                max_val = int((dev / "max_brightness").read_text().strip())
+                return int((cur / max_val) * 10000)
+            except Exception:
+                pass
+        return BacklightManager._get_dbus_brightness()
 
     @staticmethod
     def set_brightness(val: int) -> bool:
-        try:
-            subprocess.run([
-                "qdbus6", "org.kde.Solid.PowerManagement",
-                "/org/kde/Solid/PowerManagement/Actions/BrightnessControl",
-                "org.kde.Solid.PowerManagement.Actions.BrightnessControl.setBrightness",
-                str(val)
-            ], check=True, timeout=0.8)
+        devs = BacklightManager._find_backlight_devices()
+        set_any = False
+        for dev in devs:
+            try:
+                max_val = int((dev / "max_brightness").read_text().strip())
+                target_val = int((val / 10000.0) * max_val)
+                (dev / "brightness").write_text(str(target_val))
+                set_any = True
+            except Exception:
+                pass
+        if set_any:
             return True
-        except Exception as e:
-            logger.debug(f"Could not adjust brightness via qdbus6: {e}")
-            return False
+        return BacklightManager._set_dbus_brightness(val)
 
 
 class ScreenIlluminator(QtWidgets.QWidget):

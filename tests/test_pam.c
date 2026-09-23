@@ -25,6 +25,14 @@ int pam_get_user(pam_handle_t *pamh, const char **user, const char *prompt) {
     return PAM_SUCCESS;
 }
 
+// Mock implementation of pam_get_item
+int pam_get_item(const pam_handle_t *pamh, int item_type, const void **item) {
+    (void)pamh;
+    (void)item_type;
+    *item = "sudo";
+    return PAM_SUCCESS;
+}
+
 int main(int argc, char **argv) {
     const char *so_path = "pam/pam_glimpse.so";
     if (argc > 1) {

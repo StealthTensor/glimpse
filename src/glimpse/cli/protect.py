@@ -12,6 +12,7 @@ import shutil
 import logging
 import subprocess
 from pathlib import Path
+import re
 from typing import List, Optional
 
 logger = logging.getLogger("glimpse.protect")
@@ -58,24 +59,58 @@ def verify_face_auth(timeout: float = 3.0, service: str = "folder_protection") -
     return res.returncode == 0
 
 
+def find_real_binary(app_cmd: str) -> Optional[str]:
+    """Resolve the genuine system executable for an application, bypassing any wrappers."""
+    # 1. Search PATH excluding LOCAL_BIN_DIR
+    raw_path = os.environ.get("PATH", "")
+    filtered_dirs = [d for d in raw_path.split(os.path.pathsep) if d and Path(d).resolve() != LOCAL_BIN_DIR.resolve()]
+    clean_path = os.path.pathsep.join(filtered_dirs)
+    system_target = shutil.which(app_cmd, path=clean_path)
+    if system_target and Path(system_target).resolve() != (LOCAL_BIN_DIR / Path(app_cmd).name).resolve():
+        return system_target
+
+    # 2. If already wrapped in LOCAL_BIN_DIR, inspect existing wrapper for target binary
+    wrapper_path = LOCAL_BIN_DIR / Path(app_cmd).name
+    if wrapper_path.exists():
+        try:
+            content = wrapper_path.read_text()
+            m = re.search(r'exec\s+"([^"]+)"', content)
+            if m:
+                nested_target = m.group(1)
+                if nested_target != str(wrapper_path) and os.path.exists(nested_target):
+                    return nested_target
+        except Exception:
+            pass
+
+    # 3. Standard fallback
+    target = shutil.which(app_cmd)
+    if target and Path(target).resolve() != (LOCAL_BIN_DIR / Path(app_cmd).name).resolve():
+        return target
+    return None
+
+
 def protect_app(app_cmd: str, alias: Optional[str] = None) -> bool:
     """
     Wrap an application executable with a FaceID guard in ~/.local/bin/.
     """
     LOCAL_BIN_DIR.mkdir(parents=True, exist_ok=True)
-    target_path = shutil.which(app_cmd)
+    target_path = find_real_binary(app_cmd)
     if not target_path:
         print(f"[!] Error: Could not find application '{app_cmd}' in system PATH.")
         return False
 
-    name = alias or Path(target_path).name
+    name = alias or Path(app_cmd).name
     wrapper_path = LOCAL_BIN_DIR / name
 
-    if wrapper_path.resolve() == Path(target_path).resolve():
-        # Avoid direct overwrite if binary is already in ~/.local/bin
-        wrapper_path = LOCAL_BIN_DIR / f"{name}-secure"
+    # Also clean up any accidental name-secure leftover
+    secure_dup = LOCAL_BIN_DIR / f"{name}-secure"
+    if secure_dup.exists():
+        try:
+            secure_dup.unlink()
+        except Exception:
+            pass
 
-    glimpse_bin = Path(__file__).resolve().parent.parent.parent.parent / "bin" / "glimpse"
+    glimpse_bin = shutil.which("glimpse") or str(Path(__file__).resolve().parent.parent.parent.parent / "bin" / "glimpse")
 
     wrapper_content = f"""#!/usr/bin/env bash
 # Glimpse FaceID Protected Application Wrapper
@@ -92,6 +127,7 @@ fi
 
     print(f"[+] SUCCESS: Protected application '{name}'!")
     print(f"    • Wrapper installed at: {wrapper_path}")
+    print(f"    • Target binary: {target_path}")
     print(f"    • FaceID is now required to launch '{name}'.")
     return True
 
@@ -102,29 +138,38 @@ def unprotect_app(app_cmd: str) -> bool:
     """
     name = Path(app_cmd).name
     wrapper_path = LOCAL_BIN_DIR / name
+    secure_dup = LOCAL_BIN_DIR / f"{name}-secure"
 
-    if not wrapper_path.exists():
-        print(f"[!] Error: Application '{name}' is not currently protected in {LOCAL_BIN_DIR}.")
-        return False
+    removed_any = False
 
-    try:
-        content = wrapper_path.read_text()
-    except Exception as e:
-        print(f"[!] Error reading '{wrapper_path}': {e}")
-        return False
+    for target in [wrapper_path, secure_dup]:
+        if not target.exists():
+            continue
 
-    if "Glimpse FaceID Protected Application Wrapper" not in content:
-        print(f"[!] Warning: '{wrapper_path}' is not a Glimpse FaceID wrapper. Aborting for safety.")
-        return False
+        try:
+            content = target.read_text()
+        except Exception as e:
+            print(f"[!] Error reading '{target}': {e}")
+            continue
 
-    try:
-        wrapper_path.unlink()
-        print(f"[+] SUCCESS: Removed FaceID protection for '{name}'.")
-        print(f"    • Deleted wrapper: {wrapper_path}")
+        if ("Glimpse FaceID Protected Application Wrapper" not in content and
+            "Sentinel FaceID Protected Application Wrapper" not in content):
+            print(f"[!] Warning: '{target}' is not a Glimpse/Sentinel FaceID wrapper. Aborting for safety.")
+            continue
+
+        try:
+            target.unlink()
+            print(f"[+] SUCCESS: Removed FaceID protection for '{target.name}'.")
+            print(f"    • Deleted wrapper: {target}")
+            removed_any = True
+        except Exception as e:
+            print(f"[!] Error deleting wrapper '{target}': {e}")
+
+    if removed_any:
         print(f"    • '{name}' will now launch normally without biometric authentication.")
         return True
-    except Exception as e:
-        print(f"[!] Error deleting wrapper '{wrapper_path}': {e}")
+    else:
+        print(f"[!] Error: Application '{name}' is not currently protected in {LOCAL_BIN_DIR}.")
         return False
 
 

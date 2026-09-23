@@ -91,6 +91,10 @@ if [ -d "/run/user/${TARGET_UID}" ]; then
     # Disable redundant user-level daemon since system daemon is now active
     runuser -u "${TARGET_USER}" -- env ${USER_ENV} systemctl --user stop glimpsed 2>/dev/null || true
     runuser -u "${TARGET_USER}" -- env ${USER_ENV} systemctl --user disable glimpsed 2>/dev/null || true
+    # Clean up legacy sentinel user artifacts
+    runuser -u "${TARGET_USER}" -- env ${USER_ENV} systemctl --user stop sentinel-ui 2>/dev/null || true
+    runuser -u "${TARGET_USER}" -- env ${USER_ENV} systemctl --user disable sentinel-ui 2>/dev/null || true
+    rm -f "${TARGET_HOME}/.config/systemd/user/sentinel-ui.service" "${TARGET_HOME}/.config/autostart/sentinel-ui.desktop" 2>/dev/null || true
 fi
 echo "[+] User UI overlay service enabled and running."
 

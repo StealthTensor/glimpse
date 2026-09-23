@@ -32,6 +32,7 @@ from PyQt6.QtGui import QPainter, QColor, QPen, QBrush, QPainterPath, QPixmap
 
 from glimpse.ui.illuminator import ScreenIlluminator
 
+logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] [glimpse-ui] %(message)s")
 logger = logging.getLogger("glimpse.ui")
 
 

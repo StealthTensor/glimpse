@@ -1,4 +1,10 @@
-# Glimpse 
+# Glimpse 👁️
+
+[![Platform: Linux](https://img.shields.io/badge/Platform-Linux%20%7C%20Wayland%20%7C%20X11-blue?logo=linux)](https://github.com/StealthTensor/glimpse)
+[![Desktop: KDE Plasma 6](https://img.shields.io/badge/KDE-Plasma%206-1d99f3?logo=kde)](https://kde.org)
+[![Engine: ArcFace 512--D](https://img.shields.io/badge/Embedding-ArcFace%20512--D-orange)](https://github.com/deepinsight/insightface)
+[![Python: 3.11+](https://img.shields.io/badge/Python-3.11+-brightgreen?logo=python)](https://python.org)
+[![License: GPL-3.0](https://img.shields.io/badge/License-GPL--3.0-purple.svg)](LICENSE)
 
 A local-first facial authentication system for Linux that doesn't feel like a science fair project.
 
@@ -8,7 +14,18 @@ No cloud telemetry. No IR hardware required. No 10-second delays while a heavy n
 
 ---
 
-## Demo
+## Highlights & Demo
+
+<p align="center">
+  <img src="assets/unlockstatic.png" alt="Glimpse Apple FaceID Notch" width="180">
+</p>
+
+- ⚡ **Zero-Click KDE Lockscreen**: Native Wayland drop-down notch glides down and unlocks without touching the keyboard.
+- 🛡️ **Instant Sudo & Polkit**: ~480ms glance authenticates terminal `sudo` and Dolphin administrative actions.
+- 🌙 **Hardware Autobrightness (Low-Light Assist)**: Direct sysfs backlight control (`/sys/class/backlight`) boosts screen luminance in pitch-black rooms so camera can detect your face even in total darkness.
+- 🔒 **Biometric App & Vault Guard**: Gate any app (`glimpse protect kcalc`) or folder (`glimpse lock ~/vault`) behind facial recognition.
+- 🚀 **Sub-12ms ArcFace Inference**: 512-D hypersphere embeddings running on CPU with AVX2.
+
 
 
 ## Architecture & Pipeline
