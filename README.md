@@ -22,13 +22,6 @@ No cloud telemetry. No IR hardware required. No 10-second delays while a heavy n
     <img src="assets/demo.gif" alt="Glimpse Zero-Click Lockscreen FaceID Demo" width="760">
   </a>
 </p>
-
-- ⚡ **Zero-Click KDE Lockscreen**: Native Wayland drop-down notch glides down and unlocks without touching the keyboard.
-- 🛡️ **Instant Sudo & Polkit**: ~480ms glance authenticates terminal `sudo` and Dolphin administrative actions.
-- 🌙 **Hardware Autobrightness (Low-Light Assist)**: Direct sysfs backlight control (`/sys/class/backlight`) boosts screen luminance in pitch-black rooms so camera can detect your face even in total darkness.
-- 🔒 **Biometric App & Vault Guard**: Gate any app (`glimpse protect kcalc`) or folder (`glimpse lock ~/vault`) behind facial recognition.
-- 🚀 **Sub-12ms ArcFace Inference**: 512-D hypersphere embeddings running on CPU with AVX2.
-
 ---
 
 ## Architecture & Pipeline
