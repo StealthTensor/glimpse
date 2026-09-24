@@ -14,8 +14,7 @@ Glimpse brings fluid, Apple-style facial authentication to Linux desktops. It pl
 
 No cloud telemetry. No IR hardware required. No 10-second delays while a heavy neural net wakes up. Just a 400ms glance and you're in.
 
----
-## Highlights & Demo
+## Demo
 
 <p align="center">
   <a href="assets/demo.mp4">
